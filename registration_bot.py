@@ -1,25 +1,24 @@
-#region imports
-import requests
-from bs4 import BeautifulSoup
-import selenium
 from selenium import webdriver
-import smtplib
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import time
-#endregion
 
-url = 'https://webreg.burnaby.ca/webreg/Activities/ActivitiesAdvSearch.asp'
+URL = "https://webreg.burnaby.ca/webreg/Activities/ActivitiesAdvSearch.asp"
 
-driver=webdriver.Chrome("C:/Users/Work/chromedriver")
-get=driver.get(url)
-html=driver.page_source
-soup=BeautifulSoup(html,'html.parser')
+# gets rid of devtools message
+options = webdriver.ChromeOptions()
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options = options)
+driver.get(URL)
+
+driver.find_element(By.NAME, "all_search_form").click()
 
 
+filter = driver.find_element(By.NAME, "KeywordSearch")
+filter.send_keys("volleyball")
 
-title = soup.find(title="Click here for advanced search").text.strip('\n')
+driver.find_element(By.XPATH, "//input[@type='submit']").click()
 
-print("~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-print(title)
-print("~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-
-time.sleep(2)
+time.sleep(5)
