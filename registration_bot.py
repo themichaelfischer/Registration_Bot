@@ -4,6 +4,10 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 
+# TODO change to OOP
+# class Register():
+#     url
+
 def setup_driver(URL):
     # gets rid of devtools message
     options = webdriver.ChromeOptions()
@@ -33,12 +37,18 @@ def login(user, password):
     driver.find_element(By.XPATH, "//input[@type='submit']").click()
 
 def get_date():
-    # get current date
-    # choose corresponding date name + location
+    # TODO get current date
+    # TODO choose corresponding date name + location
     return "Friday"
 
 def select_course(day):
-    driver.find_element(By.XPATH, "//a[@title='Show Courses']").click()
+    parent = driver.find_element(By.XPATH, "//div[@id='activity-1-8635']")
+
+    #TODO make this function cleaner
+    parent.find_element(By.XPATH, "./child::*").click()
+    time.sleep(1)
+    # add button
+    driver.find_element(By.XPATH, "//a[@class='ui-state-active ui-corner-all link-button ajax-request from-full-page focus-parent need-focus-pageobject']").click()
 
 
 
@@ -51,9 +61,9 @@ if __name__ == "__main__":
 
     get_page(driver, "volleyball")
     
-    # check for waitlist condition
-    # if add available some how....
-    # or try to find select_course function if not continue while loop
+    # TODO check for waitlist condition
+    # TODO if add available some how....
+    # TODO or try to find select_course function if not continue while loop
 
 
     
@@ -65,7 +75,7 @@ if __name__ == "__main__":
     except:
         print("try again")
 
-    time.sleep(1)
+    time.sleep(5)
 
     # driver.refresh()
     # get_page(driver, "volleyball")
