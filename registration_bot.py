@@ -10,8 +10,13 @@ class Register():
         self._program = "volleyball"
         self._day = "Friday"
         self._info = "info.txt"
+        self._cc_info = "cc_info.txt"
         self._user = ''
         self._password = ''
+        self._card_number = ''
+        self._cvv = ''
+        self._exp_month = ''
+        self._exp_year = ''
         self._driver = self.setup_driver()
 
     # Description: set's up selenium driver
@@ -55,7 +60,7 @@ class Register():
     # Description: Selects the correct course
     def select_course(self):
         
-        parent = self._driver.find_element(By.XPATH, "//div[@id='activity-1-8635']")
+        parent = self._driver.find_element(By.XPATH, "//div[@id='activity-1-8638']")
 
         #TODO make this function cleaner as multiple clicks?
         parent.find_element(By.XPATH, "./child::*").click()
@@ -67,8 +72,16 @@ class Register():
 
     # Description: Selects the correct person to sign up
     def select_person(self):
-        pass
+        self._driver.find_element(By.XPATH, "//select[@name='ClientID']").click()
+        # TODO make this match a name instead
+        time.sleep(0.5)
+        self._driver.find_element(By.XPATH, "//option[@value='10382']").click()
         # TODO select correct person + go to credit card info
+        time.sleep(0.5)
+
+        self._driver.find_element(By.XPATH, "//input[@value='Go to Checkout']").click()
+
+        time.sleep(1)
 
     # Description: Checks if course is available to add
     def check_course_availability(self):
@@ -90,7 +103,41 @@ class Register():
     # Description: Pays for course at checkout page
     def pay_for_course(self):
         print("Made it to sign up page")
+        self.get_card_info()
+        self.print_cc_info()
+
+        self._driver.find_element(By.XPATH, "//input[@name='CardTypeIndex']").setAttribute("value", "2")
+        print("card type")
+
+        
+
+        # self._driver.find_element(By.XPATH, "//input[@name='CardNum']").send_keys()
+        print("card number")
+
+        print("cvv")
+
+        print("expiration date")
+
+        # can check with invalid stuff to make sure it works
+        print("Signed up!")
         pass
+
+    # Description: Get's card info from file
+    def get_card_info(self):
+        f = open(self._cc_info, "r")
+        self._card_number = f.readline().strip()
+        self._cvv = f.readline().strip()
+        self._exp_month = f.readline().strip()
+        self._exp_year = f.readline()
+
+        f.close()
+
+    def print_cc_info(self):
+        print(self._card_number)
+        print(self._cvv)
+        print(self._exp_month)
+        print(self._exp_year)
+
 
     # Description: Destructor which quits selenium driver
     # def __del__(self):
@@ -102,9 +149,17 @@ if __name__ == "__main__":
     reg.login()
     reg.get_page(1)
 
-    # time.sleep(1)
+    time.sleep(1)
     try:
+        print(0)
         reg.select_course()
+        time.sleep(1)
+        print(1)
+        reg.select_person()
+        print(2)
+        reg.pay_for_course()
+        
+
     except:
         print("failed ")
         # time.sleep(1)
