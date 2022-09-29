@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import Select
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 
@@ -54,21 +55,21 @@ class Register():
     # Description: Gets current date to select date you wish to sign up for
     def get_date():
         # TODO get current date
-        # TODO choose corresponding date name + location
+        # TODO have corresponding date to "//div[@id='activity-1-####']"
         return "Friday"
 
     # Description: Selects the correct course
     def select_course(self):
-        
-        parent = self._driver.find_element(By.XPATH, "//div[@id='activity-1-8638']")
+        #TODO select based on current date
+        parent = self._driver.find_element(By.XPATH, "//div[@id='activity-1-8614']")
 
         #TODO make this function cleaner as multiple clicks?
         parent.find_element(By.XPATH, "./child::*").click()
-        #TODO add sleep
-        time.sleep(1)
-        # add button
-        self._driver.find_element(By.XPATH, "//a[@class='ui-state-active ui-corner-all link-button ajax-request from-full-page focus-parent need-focus-pageobject']").click()
+        time.sleep(0.5)
 
+        # Add Element is unique so just need to refresh + try this until it works
+        self._driver.find_element(By.XPATH, "//a[@class='ui-state-active ui-corner-all link-button ajax-request from-full-page focus-parent need-focus-pageobject']").click()
+        time.sleep(1)
 
     # Description: Selects the correct person to sign up
     def select_person(self):
@@ -83,44 +84,27 @@ class Register():
 
         time.sleep(1)
 
-    # Description: Checks if course is available to add
-    def check_course_availability(self):
-        # change to while loop later
-        for i in range(5):
-            print(i)
-            try:
-                print("running")
-                self.select_course()
-                self.select_person()
-                print("Course Available!")
-                return True
-            except:
-                print("here")
-                time.sleep(1)
-                self._driver.refresh()
-        return False
-
     # Description: Pays for course at checkout page
     def pay_for_course(self):
-        print("Made it to sign up page")
         self.get_card_info()
-        self.print_cc_info()
+        print("Made it to sign up page")
 
-        self._driver.find_element(By.XPATH, "//input[@name='CardTypeIndex']").setAttribute("value", "2")
-        print("card type")
+        card_type = Select(self._driver.find_element(By.XPATH, "//select[@name='CardType']"))
+        card_type.select_by_visible_text('VISA (web)')
 
+        self._driver.find_element(By.XPATH, "//input[@name='CardNum']").send_keys(self._card_number)
+
+        self._driver.find_element(By.XPATH, "//input[@name='CardSecurityCode']").send_keys(self._cvv)
+
+        card_month = Select(self._driver.find_element(By.XPATH, "//select[@name='CardExpM']"))
+        card_month.select_by_visible_text(self._exp_month)
         
+        card_year = Select(self._driver.find_element(By.XPATH, "//select[@name='CardExpY']"))
+        card_year.select_by_visible_text(self._exp_year)
 
-        # self._driver.find_element(By.XPATH, "//input[@name='CardNum']").send_keys()
-        print("card number")
-
-        print("cvv")
-
-        print("expiration date")
-
-        # can check with invalid stuff to make sure it works
+        # TODO should run once this is un commented
+        self._driver.find_element(By.XPATH, "//input[@name='ApplyPayment']").click()
         print("Signed up!")
-        pass
 
     # Description: Get's card info from file
     def get_card_info(self):
@@ -132,49 +116,27 @@ class Register():
 
         f.close()
 
-    def print_cc_info(self):
-        print(self._card_number)
-        print(self._cvv)
-        print(self._exp_month)
-        print(self._exp_year)
-
-
     # Description: Destructor which quits selenium driver
     # def __del__(self):
     #     self._driver.quit()
 
 if __name__ == "__main__":
+    course_available = False
     reg = Register()
+
     reg.get_login_info()
     reg.login()
-    reg.get_page(1)
-
-    time.sleep(1)
-    try:
-        print(0)
-        reg.select_course()
-        time.sleep(1)
-        print(1)
-        reg.select_person()
-        print(2)
-        reg.pay_for_course()
-        
-
-    except:
-        print("failed ")
-        # time.sleep(1)
-        # reg._driver.refresh()
     
-    time.sleep(2)
+    while (not course_available):
+        reg.get_page(1)
+        try:
+            reg.select_course()
+            course_available = True
+        except:
+            print("Not Yet Available")
+            time.sleep(1)
+            reg._driver.refresh()
 
-    # TODO check for waitlist condition
-    # TODO if add available some how....
-    # TODO or try to find select_course function if not continue while loop
-
-    # TODO while loop, for while add not available.. can test on thur compared to friday which has add?
-    # TODO also check when it has a waitlist, check when selecting course that title = 'ADD'
-
-    # if (reg.check_course_availability == True):
-    #     reg.pay_for_course()
-    
+    reg.select_person()
+    reg.pay_for_course()
     
