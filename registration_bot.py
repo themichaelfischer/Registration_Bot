@@ -25,6 +25,7 @@ class Register():
         self._exp_year = ''
         self._driver = self.setup_driver()
         self._day = self.convert_week_day_to_string(dt.weekday())
+        self._course_click = ""
 
         if self._dev:
             self._program = "basketball"
@@ -99,12 +100,11 @@ class Register():
         activity_dropdown = ""
 
         if (self._dev):
-            # activity_dropdown = "//div[@id='activity-1-8607']" # edmonds
-            activity_dropdown = "//div[@id='activity-1-8613']" # bonsor basketball tuesday
+            
+            activity_dropdown = "//div[@id='activity-1-8607']" # edmonds
+            self._course_click = self._driver.find_element(By.XPATH, activity_dropdown)
+            # activity_dropdown = "//div[@id='activity-1-8613']" # bonsor basketball tuesday
             return self._driver.find_element(By.XPATH, activity_dropdown)
-
-        if (self._test):
-            self._day = "Tuesday"
 
         # if (self._day == "Tuesday"): activity_dropdown = "//div[@id='activity-1-8609']" # test table tennis
 
@@ -115,6 +115,7 @@ class Register():
         elif (self._day == "Sunday"): activity_dropdown = "//div[@id='activity-1-8638']" # christine
         elif (self._day == "Monday"): activity_dropdown = "//div[@id='activity-1-8837']"
         elif (self._day == "Wednesday"): activity_dropdown = "//div[@id='activity-1-8837']"
+        self._course_click = self._driver.find_element(By.XPATH, activity_dropdown)
         return self._driver.find_element(By.XPATH, activity_dropdown)
 
     def select_course(self):
@@ -182,7 +183,7 @@ def exectue_bot(bot):
     course_available = False
     # reg = Register(bot,True, True) # testing basketball
     # reg = Register(bot, True, False) # testing same day no buy
-    reg = Register(bot,False, False) # actually buying
+    reg = Register(bot,False, False) # actually buying still have to manually buy
     reg.get_login_info()
     reg.login()
     
@@ -199,7 +200,6 @@ def exectue_bot(bot):
             print("Not Yet Available")
             reg._driver.refresh()
         
-
     reg.select_person()
     end = time.time()
 
@@ -213,7 +213,7 @@ def exectue_bot(bot):
 
 if __name__ == "__main__":
     threading.Thread(target=exectue_bot, args = ("michael.txt",)).start()
-    threading.Thread(target=exectue_bot, args = ("arianne.txt",)).start()
+    # threading.Thread(target=exectue_bot, args = ("arianne.txt",)).start()
     # threading.Thread(target=exectue_bot, args = ("daniel.txt",)).start()
     # threading.Thread(target=exectue_bot, args = ("kayla.txt",)).start()
 
